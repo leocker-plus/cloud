@@ -1,47 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>私人云盘 - 登录</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        #login-form { max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; }
-        button { background: #0366d6; color: white; border: none; padding: 10px; cursor: pointer; }
-        #content { display: none; } /* 默认隐藏内容 */
+        #login-box { max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+        button { background: #0366d6; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        #file-list { display: none; margin-top: 20px; text-align: left; }
+        .error { color: red; }
     </style>
 </head>
 <body>
-    <div id="login-form">
-        <h2>登录云盘</h2>
-        <input type="text" id="username" placeholder="用户名" required>
-        <input type="password" id="password" placeholder="密码" required>
-        <button onclick="checkLogin()">登录</button>
-        <p id="error" style="color: red;"></p>
+    <!-- 登录框 -->
+    <div id="login-box">
+        <h2>🔒 登录私人云盘</h2>
+        <input type="text" id="username" placeholder="用户名" value="root">
+        <input type="password" id="password" placeholder="密码">
+        <button onclick="login()">登录</button>
+        <p id="error" class="error"></p>
     </div>
 
-    <div id="content">
-        <h1>欢迎访问私人云盘！</h1>
-        <p>这里是你的文件列表：</p>
-        <!-- 这里放你的文件列表或 iframe 嵌入云盘 -->
-        <iframe src="https://你的云盘链接" width="100%" height="600"></iframe>
+    <!-- 文件列表（登录后显示） -->
+    <div id="file-list">
+        <h2>📂 文件列表</h2>
+        <ul id="files"></ul>
     </div>
 
     <script>
-        function checkLogin() {
+        // 硬编码的用户名和密码
+        const CORRECT_USERNAME = "root";
+        const CORRECT_PASSWORD = "Lao82120222";
+
+        function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            const errorMsg = document.getElementById("error");
+            const errorElement = document.getElementById("error");
 
-            // 设置你的用户名和密码
-            const correctUsername = "root";
-            const correctPassword = "Lao82120222";
-
-            if (username === correctUsername && password === correctPassword) {
-                document.getElementById("login-form").style.display = "none";
-                document.getElementById("content").style.display = "block";
+            if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
+                document.getElementById("login-box").style.display = "none";
+                document.getElementById("file-list").style.display = "block";
+                loadFiles(); // 加载文件列表
             } else {
-                errorMsg.textContent = "用户名或密码错误！";
+                errorElement.textContent = "用户名或密码错误！";
             }
+        }
+
+        // 从 GitHub 仓库加载文件列表
+        function loadFiles() {
+            fetch("https://api.github.com/repos/leocker-plus/private-cloud/contents/files")
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById("files");
+                    files.forEach(file => {
+                        const li = document.createElement("li");
+                        const link = document.createElement("a");
+                        link.href = file.download_url;
+                        link.textContent = file.name;
+                        link.target = "_blank";
+                        li.appendChild(link);
+                        fileList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error("加载文件失败:", error);
+                });
         }
     </script>
 </body>
