@@ -1,1 +1,29 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LEOCKER的私人云盘</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 0 auto; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #eee; }
+        a { color: #0366d6; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>📁 私人云盘</h1>
+    <ul id="file-list"></ul>
+    <script>
+        // 自动生成文件列表
+        fetch('https://api.github.com/repos/leocker-plus/cloud/contents/')
+            .then(res => res.json())
+            .then(files => {
+                const list = document.getElementById('file-list');
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${file.download_url}">${file.name}</a>`;
+                    list.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>
