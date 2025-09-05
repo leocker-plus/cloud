@@ -3,71 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私人云盘 - 登录</title>
+    <title>我的云盘 - GitHub Pages</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        #login-box { max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
-        button { background: #0366d6; color: white; border: none; padding: 10px 15px; cursor: pointer; }
-        #file-list { display: none; margin-top: 20px; text-align: left; }
-        .error { color: red; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .embed-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .fallback {
+            text-align: center;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0366d6;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <!-- 登录框 -->
-    <div id="login-box">
-        <h2>🔒 登录私人云盘</h2>
-        <input type="text" id="username" placeholder="用户名" value="root">
-        <input type="password" id="password" placeholder="密码">
-        <button onclick="login()">登录</button>
-        <p id="error" class="error"></p>
-    </div>
+    <div class="container">
+        <h1>📁 我的云盘文件</h1>
+        <p>以下内容通过 iframe 嵌入我的网盘，如果无法显示，请点击备用链接。</p>
 
-    <!-- 文件列表（登录后显示） -->
-    <div id="file-list">
-        <h2>📂 文件列表</h2>
-        <ul id="files"></ul>
+        <!-- 嵌入网盘（可能被目标网站阻止） -->
+        <div class="embed-container">
+            <iframe 
+                id="cloud-iframe"
+                src="https://jumpshare.com/your-username" 
+                width="100%" 
+                height="600" 
+                frameborder="0"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <!-- 备用链接（如果嵌入失败时显示） -->
+        <div id="fallback" class="fallback" style="display: none;">
+            <p>⚠️ 云盘无法直接嵌入，请点击下方按钮访问：</p>
+            <a href="https://jumpshare.com/your-username" class="btn" target="_blank">跳转到我的云盘</a>
+        </div>
     </div>
 
     <script>
-        // 硬编码的用户名和密码
-        const CORRECT_USERNAME = "root";
-        const CORRECT_PASSWORD = "Lao82120222";
-
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const errorElement = document.getElementById("error");
-
-            if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
-                document.getElementById("login-box").style.display = "none";
-                document.getElementById("file-list").style.display = "block";
-                loadFiles(); // 加载文件列表
-            } else {
-                errorElement.textContent = "用户名或密码错误！";
-            }
-        }
-
-        // 从 GitHub 仓库加载文件列表
-        function loadFiles() {
-            fetch("https://api.github.com/repos/leocker-plus/private-cloud/contents/files")
-                .then(response => response.json())
-                .then(files => {
-                    const fileList = document.getElementById("files");
-                    files.forEach(file => {
-                        const li = document.createElement("li");
-                        const link = document.createElement("a");
-                        link.href = file.download_url;
-                        link.textContent = file.name;
-                        link.target = "_blank";
-                        li.appendChild(link);
-                        fileList.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error("加载文件失败:", error);
-                });
-        }
+        // 检测 iframe 是否被阻止加载
+        document.getElementById('cloud-iframe').onload = function() {
+            // 如果 iframe 成功加载，隐藏备用链接
+            document.getElementById('fallback').style.display = 'none';
+        };
+        document.getElementById('cloud-iframe').onerror = function() {
+            // 如果 iframe 加载失败，显示备用链接
+            document.getElementById('fallback').style.display = 'block';
+        };
     </script>
 </body>
 </html>
